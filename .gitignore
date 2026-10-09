@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+data/
+.venv/
+.env
+*.db
+*.sqlite*
+target/
+.maven-cache/
