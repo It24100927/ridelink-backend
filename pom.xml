@@ -9,5 +9,6 @@
   <packaging>pom</packaging>
   <modules>
     <module>driver-service</module>
+    <module>ride-service</module>
   </modules>
 </project>
