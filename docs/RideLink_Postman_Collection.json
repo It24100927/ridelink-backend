@@ -1,0 +1,370 @@
+{
+	"info": {
+		"_postman_id": "c1f2e3d4-5678-4a90-b123-ride-management",
+		"name": "RideLink API Collection - Ride Management Service",
+		"description": "Postman Collection for IT3130 RideLink Backend Microservices. Covers all endpoints, success workflows, lifecycle transitions, and negative test scenarios.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Successful Workflows",
+			"item": [
+				{
+					"name": "1. Create Ride Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 201 Created', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.rideId) {",
+									"    pm.environment.set('ride_id', jsonData.rideId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"passengerId\": \"{{passenger_id}}\",\n  \"pickupLocation\": \"Colombo 03\",\n  \"destination\": \"Kandy Central\"\n}"
+						},
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides"
+							]
+						}
+					}
+				},
+				{
+					"name": "2. Assign Driver",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driver_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides/{{ride_id}}/assign",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides",
+								"{{ride_id}}",
+								"assign"
+							]
+						}
+					}
+				},
+				{
+					"name": "3. Accept Ride",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driver_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides/{{ride_id}}/accept",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides",
+								"{{ride_id}}",
+								"accept"
+							]
+						}
+					}
+				},
+				{
+					"name": "4. Start Ride",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driver_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides/{{ride_id}}/start",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides",
+								"{{ride_id}}",
+								"start"
+							]
+						}
+					}
+				},
+				{
+					"name": "5. Complete Ride",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driver_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides/{{ride_id}}/complete",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides",
+								"{{ride_id}}",
+								"complete"
+							]
+						}
+					}
+				},
+				{
+					"name": "6. Get Ride Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides/{{ride_id}}",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides",
+								"{{ride_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "7. Get Rides by Passenger",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides/passenger/{{passenger_id}}",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides",
+								"passenger",
+								"{{passenger_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "8. Get Rides by Driver",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides/driver/{{driver_id}}",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides",
+								"driver",
+								"{{driver_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "9. Cancel Ride",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"passengerId\": \"{{passenger_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides/{{ride_id}}/cancel",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides",
+								"{{ride_id}}",
+								"cancel"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Negative Scenarios",
+			"item": [
+				{
+					"name": "1. Invalid Input Validation (400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 400 Bad Request', function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"passengerId\": \"\",\n  \"pickupLocation\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides"
+							]
+						}
+					}
+				},
+				{
+					"name": "2. Ride Not Found (404)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 404 Not Found', function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides/non-existent-id-999",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides",
+								"non-existent-id-999"
+							]
+						}
+					}
+				},
+				{
+					"name": "3. Invalid Status Transition (409)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 409 Conflict', function () {",
+									"    pm.response.to.have.status(409);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"driverId\": \"{{driver_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{ride_service_url}}/api/rides/{{ride_id}}/complete",
+							"host": [
+								"{{ride_service_url}}"
+							],
+							"path": [
+								"api",
+								"rides",
+								"{{ride_id}}",
+								"complete"
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}

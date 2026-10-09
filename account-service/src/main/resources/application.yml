@@ -1,0 +1,19 @@
+server:
+  port: 4001
+
+spring:
+  application:
+    name: account-service
+  data:
+    mongodb:
+      uri: mongodb+srv://jkavinda680:KrD48DDtJlrWGyyH@cluster0.pk643sq.mongodb.net/account_db?retryWrites=true&w=majority&appName=Cluster0
+
+jwt:
+  secret: ridelink-shared-secret-change-me-to-a-long-random-string
+  expiration-ms: 3600000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

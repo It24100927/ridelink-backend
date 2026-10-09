@@ -1,0 +1,41 @@
+# Build output
+target/
+bin/
+**/target/
+**/bin/
+
+# Maven wrapper
+!.mvn/wrapper/maven-wrapper.jar
+!mvnw
+!mvnw.cmd
+
+# Eclipse / STS
+.settings/
+.classpath
+.project
+.metadata/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+*.log.*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# Environment / local settings
+.env
+*.env

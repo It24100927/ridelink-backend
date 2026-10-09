@@ -1,0 +1,1151 @@
+{
+    "info":  {
+                 "name":  "RideLink - Fare \u0026 Payment Service (8084)",
+                 "description":  "Fare estimation, final fare, simulated payments and receipts. Select an environment, then run the collection top to bottom.",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "item":  [
+                 {
+                     "name":  "1. Successful workflows",
+                     "item":  [
+                                  {
+                                      "name":  "1. Estimate fare by place names (no token)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"estimatedFare is a number\", function () { pm.expect(j.estimatedFare).to.be.a(\"number\"); });",
+                                                                                    "pm.test(\"distance is about 95.8 km\", function () { pm.expect(j.distanceKm).to.be.within(95, 97); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/estimate",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "estimate"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"pickup\":\"Colombo 03\",\"destination\":\"Kandy Central\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "2. Estimate fare by coordinates (no token)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"estimatedFare is 371.60\", function () { pm.expect(j.estimatedFare).to.eql(371.6); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/estimate",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "estimate"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"pickup\":\"6.9271,79.8612\",\"destination\":\"6.9022,79.8613\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "3. Final fare (DRIVER)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.environment.set(\"ride_id\", \"ride-\" + Date.now());"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "prerequest"
+                                                    },
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 201\", function () { pm.response.to.have.status(201); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"totalFare is 582\", function () { pm.expect(j.totalFare).to.eql(582); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{driver_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/final",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "final"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_id}}\",\"passengerId\":\"passenger-1\",\"actualDistanceKm\":5.4}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "4. Get the stored fare",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"rideId matches\", function () { pm.expect(j.rideId).to.eql(pm.environment.get(\"ride_id\")); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/ride/{{ride_id}}",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "ride",
+                                                                               "{{ride_id}}"
+                                                                           ]
+                                                              }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "5. Final fare from place names (DRIVER)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.environment.set(\"ride_c\", \"ride-c-\" + Date.now());"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "prerequest"
+                                                    },
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 201\", function () { pm.response.to.have.status(201); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"short trip is close to the minimum fare\", function () { pm.expect(j.totalFare).to.be.above(250); pm.expect(j.totalFare).to.be.below(400); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{driver_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/final",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "final"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_c}}\",\"passengerId\":\"passenger-3\",\"pickup\":\"Colombo 03\",\"destination\":\"Colombo 07\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "6. Pay for the ride (PASSENGER, minimal body)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 201\", function () { pm.response.to.have.status(201); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"payment is COMPLETED with a receipt number\", function () { pm.expect(j.status).to.eql(\"COMPLETED\"); pm.expect(j.receiptNumber).to.be.a(\"string\"); });",
+                                                                                    "pm.test(\"amount comes from the stored fare\", function () { pm.expect(j.amount).to.eql(582); });",
+                                                                                    "pm.environment.set(\"payment_id\", j.id);"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_id}}\",\"method\":\"CARD\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "7. Get the payment and its status",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"status is COMPLETED\", function () { pm.expect(j.status).to.eql(\"COMPLETED\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments/{{payment_id}}",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments",
+                                                                               "{{payment_id}}"
+                                                                           ]
+                                                              }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "8. List payment attempts for the ride",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"one attempt\", function () { pm.expect(j.length).to.eql(1); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments/ride/{{ride_id}}",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments",
+                                                                               "ride",
+                                                                               "{{ride_id}}"
+                                                                           ]
+                                                              }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "9. Get the receipt",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"receipt shows the fare breakdown\", function () { pm.expect(j.totalPaid).to.eql(582); pm.expect(j.receiptNumber).to.be.a(\"string\"); pm.expect(j.distanceKm).to.eql(5.4); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments/{{payment_id}}/receipt",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments",
+                                                                               "{{payment_id}}",
+                                                                               "receipt"
+                                                                           ]
+                                                              }
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "2. Negative scenarios and failed payment",
+                     "item":  [
+                                  {
+                                      "name":  "1. Estimate with an unknown location (400)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 400\", function () { pm.response.to.have.status(400); });",
+                                                                                    "pm.test(\"Error body has status 400 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(400); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/estimate",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "estimate"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"pickup\":\"Atlantis\",\"destination\":\"Galle\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "2. Estimate with an empty body (400)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 400\", function () { pm.response.to.have.status(400); });",
+                                                                                    "pm.test(\"Error body has status 400 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(400); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/estimate",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "estimate"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "3. Final fare without a token (401)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 401\", function () { pm.response.to.have.status(401); });",
+                                                                                    "pm.test(\"Error body has status 401 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(401); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/final",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "final"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_id}}\",\"passengerId\":\"passenger-1\",\"actualDistanceKm\":5.4}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "4. Final fare as PASSENGER (403)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 403\", function () { pm.response.to.have.status(403); });",
+                                                                                    "pm.test(\"Error body has status 403 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(403); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/final",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "final"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_id}}\",\"passengerId\":\"passenger-1\",\"actualDistanceKm\":5.4}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "5. Payment as DRIVER (403)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 403\", function () { pm.response.to.have.status(403); });",
+                                                                                    "pm.test(\"Error body has status 403 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(403); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{driver_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_id}}\",\"method\":\"CARD\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "6. Duplicate final fare (409)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 409\", function () { pm.response.to.have.status(409); });",
+                                                                                    "pm.test(\"Error body has status 409 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(409); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{driver_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/final",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "final"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_id}}\",\"passengerId\":\"passenger-1\",\"actualDistanceKm\":5.4}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "7. Pay a ride twice (409)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 409\", function () { pm.response.to.have.status(409); });",
+                                                                                    "pm.test(\"Error body has status 409 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(409); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_id}}\",\"method\":\"CARD\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "8. Final fare with no distance and no locations (400)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 400\", function () { pm.response.to.have.status(400); });",
+                                                                                    "pm.test(\"Error body has status 400 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(400); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{driver_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/final",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "final"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"ride-no-distance\",\"passengerId\":\"passenger-4\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "9. Fare not found (404)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 404\", function () { pm.response.to.have.status(404); });",
+                                                                                    "pm.test(\"Error body has status 404 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(404); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/ride/ride-0000",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "ride",
+                                                                               "ride-0000"
+                                                                           ]
+                                                              }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "10. Payment for a ride with no fare (404)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 404\", function () { pm.response.to.have.status(404); });",
+                                                                                    "pm.test(\"Error body has status 404 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(404); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"ride-no-fare\",\"method\":\"CARD\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "11. Invalid payment method (400)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 400\", function () { pm.response.to.have.status(400); });",
+                                                                                    "pm.test(\"Error body has status 400 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(400); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_id}}\",\"method\":\"BITCOIN\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "12. Setup: final fare for a second ride (DRIVER)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.environment.set(\"ride_b\", \"ride-b-\" + Date.now());"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "prerequest"
+                                                    },
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 201\", function () { pm.response.to.have.status(201); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"totalFare is 470\", function () { pm.expect(j.totalFare).to.eql(470); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{driver_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/fares/final",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "fares",
+                                                                               "final"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_b}}\",\"passengerId\":\"passenger-2\",\"actualDistanceKm\":4.0}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "13. Failed simulated payment (FAILED, no receipt)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 201\", function () { pm.response.to.have.status(201); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"status is FAILED with a reason and no receipt\", function () { pm.expect(j.status).to.eql(\"FAILED\"); pm.expect(j.failureReason).to.be.a(\"string\"); pm.expect(j.receiptNumber === null || j.receiptNumber === undefined).to.eql(true); });",
+                                                                                    "pm.environment.set(\"failed_payment_id\", j.id);"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_b}}\",\"method\":\"CARD\",\"simulateFailure\":true}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "14. Receipt of the failed payment (409)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 409\", function () { pm.response.to.have.status(409); });",
+                                                                                    "pm.test(\"Error body has status 409 and a message\", function () { var e = pm.response.json(); pm.expect(e.status).to.eql(409); pm.expect(e.message).to.be.a(\"string\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments/{{failed_payment_id}}/receipt",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments",
+                                                                               "{{failed_payment_id}}",
+                                                                               "receipt"
+                                                                           ]
+                                                              }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "15. Retry the payment (COMPLETED)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 201\", function () { pm.response.to.have.status(201); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"retry succeeds\", function () { pm.expect(j.status).to.eql(\"COMPLETED\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "raw":  "{\"rideId\":\"{{ride_b}}\",\"method\":\"CASH\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               },
+                                                                   "mode":  "raw"
+                                                               }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "16. List attempts, newest first (two attempts)",
+                                      "event":  [
+                                                    {
+                                                        "script":  {
+                                                                       "exec":  [
+                                                                                    "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
+                                                                                    "var j = pm.response.json();",
+                                                                                    "pm.test(\"two attempts, COMPLETED first\", function () { pm.expect(j.length).to.eql(2); pm.expect(j[0].status).to.eql(\"COMPLETED\"); pm.expect(j[1].status).to.eql(\"FAILED\"); });"
+                                                                                ],
+                                                                       "type":  "text/javascript"
+                                                                   },
+                                                        "listen":  "test"
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{passenger_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "raw":  "{{base_url}}/api/payments/ride/{{ride_b}}",
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "payments",
+                                                                               "ride",
+                                                                               "{{ride_b}}"
+                                                                           ]
+                                                              }
+                                                  }
+                                  }
+                              ]
+                 }
+             ]
+}
